@@ -46,10 +46,10 @@ class UsageViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.value = UsageUiState.NoData
                 } else {
                     val chartEntries = processedStats.mapIndexed { index, usageStats ->
-                        object : ChartEntry {
-                            override val x: Float = index.toFloat()
-                            override val y: Float = TimeUnit.MILLISECONDS.toMinutes(usageStats.totalTimeInForeground).toFloat()
-                        }
+                        MyChartEntry(
+                            x = index.toFloat(),
+                            y = TimeUnit.MILLISECONDS.toMinutes(usageStats.totalTimeInForeground).toFloat()
+                        )
                     }
                     _chartModelProducer.setEntries(chartEntries)
                     _uiState.value = UsageUiState.Success(processedStats.map { it.packageName })
@@ -63,4 +63,11 @@ sealed class UsageUiState {
     object Loading : UsageUiState()
     object NoData : UsageUiState()
     data class Success(val labels: List<String>) : UsageUiState()
+}
+
+private data class MyChartEntry(
+    override val x: Float,
+    override val y: Float,
+) : ChartEntry {
+    override fun withY(y: Float) = MyChartEntry(x, y)
 }
